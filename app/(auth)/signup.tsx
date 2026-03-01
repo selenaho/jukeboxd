@@ -79,7 +79,7 @@ export default function SignupScreen() {
         return;
       }
 
-      Alert.alert("Account created! Please check your email to confirm your account.");
+      Alert.alert("Account created!");
       router.push('/login'); // redirect to login screen after successful signup
     } catch (error) {
       Alert.alert("Error", "An unexpected error occurred. Please try again.");
