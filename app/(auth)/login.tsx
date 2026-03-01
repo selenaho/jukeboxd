@@ -13,7 +13,7 @@ export default function LoginScreen() {
     const { error } = await supabase.auth.signInWithPassword({ email, password }); // attempt to sign in with email and password
 
     if (error) {
-    Alert.alert("Login Error", error.message); // show error if login fails
+      Alert.alert("Login Error", "Invalid login credentials"); // show error if login fails
     } else {
       router.replace('/'); // redirect to home screen on successful login
     }

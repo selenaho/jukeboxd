@@ -89,7 +89,7 @@ export default function SignupScreen() {
   };
 
   return (
-    <View>
+    <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
       <TextInput
         placeholder="Email"
         value={email}
