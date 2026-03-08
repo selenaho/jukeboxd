@@ -5,14 +5,59 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import fs from 'fs';
 
-axios.defaults.timeout = 15000; // 15 seconds
+axios.defaults.timeout = 15000; // setting explicit timeout value of 15 seconds
 
 dotenv.config();
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
+const songsBatch = [];
+const albumsBatch = [];
+const artistsBatch = [];
+const albumArtistBatch = [];
+const songAlbumBatch = [];
+const songArtistBatch = [];
+
 // load artists from artists.txt
 const artists = fs.readFileSync('artists.txt', 'utf-8').split('\n').map(s => s.trim()).filter(Boolean);
+
+// helper function because spotify api keeps giving ETIMEDOUT errors so retrying request a few times before giving up on it
+async function retry(fn, retries = 3, delay = 1000) {
+  try {
+    return await fn();
+  } catch (error) {
+    if (error === "ETIMEDOUT" && retries > 0) {
+      console.warn(`Error occurred, retrying in ${delay}ms... (${retries} retries left)`);
+      await new Promise(res => setTimeout(res, delay));
+      return retry(fn, retries - 1, delay * 2); // exponential backoff
+    } else {
+      throw error;
+    }
+  }
+}
+
+async function flushBatch(table, batch) {
+  if (batch.length === 0) return;
+
+  const { error } = await supabase
+    .from(table)
+    .upsert(batch);
+
+  if (error) {
+    console.error(`Error inserting into ${table}`, error);
+  }
+
+  batch.length = 0;
+}
+
+async function flushAll() {
+  await flushBatch("Artist", artistsBatch);
+  await flushBatch("Album", albumsBatch);
+  await flushBatch("Song", songsBatch);
+  await flushBatch("SongAlbum", songAlbumBatch);
+  await flushBatch("AlbumArtist", albumArtistBatch);
+  await flushBatch("SongArtist", songArtistBatch);
+}
 
 async function getSpotifyAccessToken() {
   const response = await axios.post('https://accounts.spotify.com/api/token', new URLSearchParams({
@@ -85,23 +130,9 @@ async function fetchTracksForAlbum(albumId, accessToken) {
   return tracksResponse.data.items;
 }
 
-// helper function because spotify api keeps giving ETIMEDOUT errors so retrying request a few times before giving up on it
-async function retry(fn, retries = 3, delay = 1000) {
-  try {
-    return await fn();
-  } catch (error) {
-    if (error === "ETIMEDOUT" && retries > 0) {
-      console.warn(`Error occurred, retrying in ${delay}ms... (${retries} retries left)`);
-      await new Promise(res => setTimeout(res, delay));
-      return retry(fn, retries - 1, delay * 2); // exponential backoff
-    } else {
-      throw error;
-    }
-  }
-}
-
 async function run() {
   const accessToken = await getSpotifyAccessToken();
+
   //process each of the artists in our artists.txt
   for (const artistName of artists) {
     try {
@@ -111,21 +142,23 @@ async function run() {
         console.log(`Artist not found: ${artistName}`);
         continue;
       }
-      await supabase.from("Artist").upsert({
+      
+      artistsBatch.push({
         artist_id: artistData.id,
         artist_name: artistData.name
       });
+
       const albums = await retry(() => fetchAlbumsForArtist(artistData.id, accessToken));
       //then each of the albums for that artist
       for (const album of albums) {
-        await supabase.from("Album").upsert({
+        albumsBatch.push({
           album_id: album.id,
           album_name: album.name,
           album_release_date: album.release_date,
           album_art_url: album.images[2]?.url || album.images[1]?.url || album.images[0]?.url || null // prioritizing the smaller images first rather than the larger ones bc this is mobile app
         });
 
-        await supabase.from("AlbumArtist").upsert({
+        albumArtistBatch.push({
           album_id: album.id,
           artist_id: artistData.id
         });
@@ -133,21 +166,26 @@ async function run() {
         //and then each of the songs for that album
         const tracks = await retry(() => fetchTracksForAlbum(album.id, accessToken));
         for (const track of tracks) {
-          await supabase.from("Song").upsert({
+          songsBatch.push({
             song_id: track.id,
             song_title: track.name 
           });
 
-          await supabase.from("SongAlbum").upsert({
+          songAlbumBatch.push({
             song_id: track.id,
             album_id: album.id
           });
+
+          songArtistBatch.push({
+            song_id: track.id,
+            artist_id: artistData.id
+          });
         }
       }
-  } catch (error) {
+    } catch (error) {
       console.error(`Error processing artist ${artistName}:`, error);
     }
-    await new Promise(r => setTimeout(r, 200)); // getting timed out errors w spotify api, adding small delay between each artist to try to fix
+    await flushAll(); // flush after each artist
   }
   console.log("Done!");
 }
