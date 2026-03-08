@@ -124,7 +124,7 @@ export default function SearchScreen() {
     Song: "#1DB954",
     Album: "#1E90FF",
     Artist: "#FF6B6B",
-    Users: "#111111", // color can be decided later
+    Users: "#8B5CF6",
   };
 
   const renderItem = ({ item }: { item: Item }) => (
