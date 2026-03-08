@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 
-type Tab = "All" | "Song" | "Album" | "Artist";
+type Tab = "All" | "Song" | "Album" | "Artist" | "Users";
 
 type Item = {
   id: string;
@@ -42,7 +42,11 @@ export default function SearchScreen() {
           .ilike("song_title", `%${query}%`);
         if (error) throw error;
         (data || []).forEach((row) =>
-          results.push({ id: row.song_id, title: row.song_title, type: "Song" })
+          results.push({
+            id: row.song_id,
+            title: row.song_title,
+            type: "Song",
+          }),
         );
       }
 
@@ -53,7 +57,11 @@ export default function SearchScreen() {
           .ilike("album_name", `%${query}%`);
         if (error) throw error;
         (data || []).forEach((row) =>
-          results.push({ id: row.album_id, title: row.album_name, type: "Album" })
+          results.push({
+            id: row.album_id,
+            title: row.album_name,
+            type: "Album",
+          }),
         );
       }
 
@@ -64,7 +72,26 @@ export default function SearchScreen() {
           .ilike("artist_name", `%${query}%`);
         if (error) throw error;
         (data || []).forEach((row) =>
-          results.push({ id: row.artist_id, title: row.artist_name, type: "Artist" })
+          results.push({
+            id: row.artist_id,
+            title: row.artist_name,
+            type: "Artist",
+          }),
+        );
+      }
+
+      if (shouldFetch("Users")) {
+        const { data, error } = await supabase
+          .from("User")
+          .select("user_id, user_username")
+          .ilike("user_username", `%${query}%`);
+        if (error) throw error;
+        (data || []).forEach((row) =>
+          results.push({
+            id: row.user_id,
+            title: row.user_username,
+            type: "Users",
+          }),
         );
       }
 
@@ -90,19 +117,25 @@ export default function SearchScreen() {
     });
   };
 
-  const TABS: Tab[] = ["All", "Song", "Album", "Artist"];
+  const TABS: Tab[] = ["All", "Song", "Album", "Artist", "Users"];
 
   const typeColors: Record<Tab, string> = {
     All: "#888",
     Song: "#1DB954",
     Album: "#1E90FF",
     Artist: "#FF6B6B",
+    Users: "#111111", // color can be decided later
   };
 
   const renderItem = ({ item }: { item: Item }) => (
-    <TouchableOpacity style={styles.itemContainer} onPress={() => handleItemPress(item)}>
+    <TouchableOpacity
+      style={styles.itemContainer}
+      onPress={() => handleItemPress(item)}
+    >
       <View style={styles.itemLeft}>
-        <View style={[styles.typeBadge, { backgroundColor: typeColors[item.type] }]}>
+        <View
+          style={[styles.typeBadge, { backgroundColor: typeColors[item.type] }]}
+        >
           <Text style={styles.typeBadgeText}>{item.type}</Text>
         </View>
         <Text style={styles.itemName}>{item.title}</Text>
@@ -130,7 +163,12 @@ export default function SearchScreen() {
             style={[styles.tab, activeTab === tab && styles.tabActive]}
             onPress={() => setActiveTab(tab)}
           >
-            <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === tab && styles.tabTextActive,
+              ]}
+            >
               {tab}
             </Text>
           </TouchableOpacity>
@@ -138,7 +176,11 @@ export default function SearchScreen() {
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#1DB954" style={{ marginTop: 40 }} />
+        <ActivityIndicator
+          size="large"
+          color="#1DB954"
+          style={{ marginTop: 40 }}
+        />
       ) : error ? (
         <Text style={styles.errorText}>Error: {error}</Text>
       ) : items.length === 0 ? (
@@ -157,7 +199,12 @@ export default function SearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: 50, paddingHorizontal: 16, backgroundColor: "#fff" },
+  container: {
+    flex: 1,
+    paddingTop: 50,
+    paddingHorizontal: 16,
+    backgroundColor: "#fff",
+  },
   searchBar: {
     height: 44,
     borderWidth: 1,
@@ -194,5 +241,10 @@ const styles = StyleSheet.create({
   itemName: { fontSize: 15, color: "#222", flex: 1 },
   chevron: { fontSize: 22, color: "#ccc", marginLeft: 8 },
   errorText: { color: "red", textAlign: "center", marginTop: 20 },
-  emptyText: { color: "#aaa", textAlign: "center", marginTop: 40, fontSize: 15 },
+  emptyText: {
+    color: "#aaa",
+    textAlign: "center",
+    marginTop: 40,
+    fontSize: 15,
+  },
 });
