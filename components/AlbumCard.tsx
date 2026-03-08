@@ -1,36 +1,36 @@
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
-interface PlaceCardProps {
-  placeName: string;
-  placeImage?: string;
+interface albumCardProps {
+  albumName: string;
+  albumImage?: string;
   rating: number;
   reviewCount: number;
 }
 
-export default function PlaceCard({
-  placeName,
-  placeImage,
+export default function AlbumCard({
+  albumName,
+  albumImage,
   rating,
   reviewCount,
-}: PlaceCardProps) {
+}: albumCardProps) {
   return (
     <View style={styles.card}>
-      {/* Place image or placeholder */}
+      {/* album image or albumholder */}
       <View style={styles.imageContainer}>
-        {placeImage ? (
-          <Image source={{ uri: placeImage }} style={styles.image} />
+        {albumImage ? (
+          <Image source={{ uri: albumImage }} style={styles.image} />
         ) : (
-          <View style={styles.imagePlaceholder}>
-            <Text style={styles.placeholderText}>No Image</Text>
+          <View style={styles.imagealbumholder}>
+            <Text style={styles.albumholderText}>No Image</Text>
           </View>
         )}
       </View>
 
-      {/* Place info */}
+      {/* album info */}
       <View style={styles.content}>
-        <Text style={styles.placeName} numberOfLines={2}>
-          {placeName}
+        <Text style={styles.albumName} numberOfLines={2}>
+          {albumName}
         </Text>
 
         {/* Rating */}
@@ -77,21 +77,21 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  imagePlaceholder: {
+  imagealbumholder: {
     width: "100%",
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#e5e7eb",
   },
-  placeholderText: {
+  albumholderText: {
     color: "#9ca3af",
     fontSize: 12,
   },
   content: {
     padding: 12,
   },
-  placeName: {
+  albumName: {
     fontSize: 14,
     fontWeight: "600",
     color: "#1f2937",

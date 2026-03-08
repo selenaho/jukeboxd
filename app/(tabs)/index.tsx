@@ -145,7 +145,7 @@ export default function Index() {
           <ActivityCard
             userName={item.userName}
             userAvatar={item.userAvatar}
-            placeVisited={item.albumName}
+            albumVisited={item.albumName}
             review={item.reviewText}
             rating={item.rating}
             timestamp={item.timestamp}

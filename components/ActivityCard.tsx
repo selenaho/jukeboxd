@@ -4,7 +4,7 @@ import { Image, StyleSheet, Text, View } from "react-native";
 interface ActivityCardProps {
   userAvatar?: string;
   userName: string;
-  placeVisited: string;
+  albumVisited: string;
   review: string;
   rating: number;
   timestamp: string;
@@ -13,7 +13,7 @@ interface ActivityCardProps {
 export default function ActivityCard({
   userAvatar,
   userName,
-  placeVisited,
+  albumVisited,
   review,
   rating,
   timestamp,
@@ -45,9 +45,9 @@ export default function ActivityCard({
         </View>
       </View>
 
-      {/* Place and review info */}
+      {/* album and review info */}
       <View style={styles.content}>
-        <Text style={styles.placeVisited}>{placeVisited}</Text>
+        <Text style={styles.albumVisited}>{albumVisited}</Text>
 
         {/* Rating stars */}
         <View style={styles.ratingContainer}>
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   content: {
     marginLeft: 52,
   },
-  placeVisited: {
+  albumVisited: {
     fontSize: 15,
     fontWeight: "600",
     color: "#1f2937",

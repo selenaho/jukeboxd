@@ -1,6 +1,6 @@
+import AlbumCard from "@/components/AlbumCard";
 import EmptyState from "@/components/EmptyState";
 import LoadingState from "@/components/LoadingState";
-import PlaceCard from "@/components/PlaceCard";
 import { supabase } from "@/utils/supabase";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -16,13 +16,13 @@ interface UserAlbum {
 
 export default function YourListsScreen() {
   const router = useRouter();
-  const [places, setPlaces] = useState<UserAlbum[]>([]);
+  const [albums, setalbums] = useState<UserAlbum[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   /**
-   * Load user's reviewed places from Supabase
+   * Load user's reviewed albums from Supabase
    */
   const loadMyList = async () => {
     try {
@@ -81,7 +81,7 @@ export default function YourListsScreen() {
         }
       });
 
-      setPlaces(Array.from(albumMap.values()));
+      setalbums(Array.from(albumMap.values()));
     } catch (err) {
       console.error("Exception loading my list:", err);
       setError("An error occurred while loading your list");
@@ -113,18 +113,18 @@ export default function YourListsScreen() {
   };
 
   // Loading state
-  if (loading && places.length === 0) {
+  if (loading && albums.length === 0) {
     return <LoadingState />;
   }
 
   // Empty state
-  if (!loading && (!places || places.length === 0)) {
+  if (!loading && (!albums || albums.length === 0)) {
     return (
       <View style={styles.container}>
         <EmptyState
           icon="bookmark-outline"
           message="Your list is empty"
-          description="Start reviewing places to build your personal collection."
+          description="Start reviewing albums to build your personal collection."
           buttonText="Make some reviews"
           onButtonClick={handleMakeReviews}
         />
@@ -136,12 +136,12 @@ export default function YourListsScreen() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={places}
+        data={albums}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <PlaceCard
-            placeName={item.albumName}
-            placeImage={item.albumArtUrl}
+          <AlbumCard
+            albumName={item.albumName}
+            albumImage={item.albumArtUrl}
             rating={item.rating}
             reviewCount={item.reviewCount}
           />
