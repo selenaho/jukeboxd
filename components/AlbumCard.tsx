@@ -1,7 +1,7 @@
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
-interface albumCardProps {
+interface AlbumCardProps {
   albumName: string;
   albumImage?: string;
   rating: number;
@@ -13,7 +13,7 @@ export default function AlbumCard({
   albumImage,
   rating,
   reviewCount,
-}: albumCardProps) {
+}: AlbumCardProps) {
   return (
     <View style={styles.card}>
       {/* album image or albumholder */}

@@ -16,7 +16,7 @@ interface UserAlbum {
 
 export default function YourListsScreen() {
   const router = useRouter();
-  const [albums, setalbums] = useState<UserAlbum[]>([]);
+  const [albums, setAlbums] = useState<UserAlbum[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +81,7 @@ export default function YourListsScreen() {
         }
       });
 
-      setalbums(Array.from(albumMap.values()));
+      setAlbums(Array.from(albumMap.values()));
     } catch (err) {
       console.error("Exception loading my list:", err);
       setError("An error occurred while loading your list");

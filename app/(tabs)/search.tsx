@@ -148,7 +148,7 @@ export default function SearchScreen() {
     <View style={styles.container}>
       <TextInput
         style={styles.searchBar}
-        placeholder="Search for songs, albums, or artists..."
+        placeholder="Search for songs, albums, artists, users..."
         placeholderTextColor="#999"
         value={searchQuery}
         onChangeText={setSearchQuery}
