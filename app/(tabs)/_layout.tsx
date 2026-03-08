@@ -7,7 +7,10 @@ export default function TabLayout() {
       <Tabs.Screen name="search" options={{ title: "Search" }} />
       <Tabs.Screen name="your_lists" options={{ title: "Your Lists" }} />
       <Tabs.Screen name="profile" options={{ title: "Profile" }} />
-      <Tabs.Screen name="detail" options={{ title: "Detail" }} />
+      <Tabs.Screen
+        name="detail"
+        options={{ title: "Detail", headerShown: false, href: null }}
+      />
     </Tabs>
   );
 }
