@@ -8,6 +8,7 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   Alert,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -226,23 +227,33 @@ export default function Profile() {
   };
 
   const handleLogout = async () => {
+    const executeLogout = async () => {
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          Alert.alert("Error", "Failed to logout: " + error.message);
+          return;
+        }
+        router.replace("/");
+      } catch (err) {
+        Alert.alert("Error", "An unexpected error occurred");
+      }
+    };
+
+    if (Platform.OS === "web") {
+      const confirmed = window.confirm("Are you sure you want to logout?");
+      if (confirmed) {
+        executeLogout();
+      }
+      return;
+    }
+
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Logout",
         style: "destructive",
-        onPress: async () => {
-          try {
-            const { error } = await supabase.auth.signOut();
-            if (error) {
-              Alert.alert("Error", "Failed to logout: " + error.message);
-              return;
-            }
-            router.replace("/");
-          } catch (err) {
-            Alert.alert("Error", "An unexpected error occurred");
-          }
-        },
+        onPress: executeLogout,
       },
     ]);
   };
