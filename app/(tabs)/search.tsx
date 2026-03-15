@@ -111,10 +111,17 @@ export default function SearchScreen() {
   }, [searchQuery, activeTab]);
 
   const handleItemPress = (item: Item) => {
-    router.push({
-      pathname: `/detail`,
-      params: { id: item.id, type: item.type, title: item.title },
-    });
+    if (item.type === "Users") {
+      router.push({
+        pathname: "/user_detail",
+        params: { id: item.id },
+      });
+    } else {
+      router.push({
+        pathname: "/detail",
+        params: { id: item.id, type: item.type, title: item.title },
+      });
+    }
   };
 
   const TABS: Tab[] = ["All", "Song", "Album", "Artist", "Users"];

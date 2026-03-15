@@ -12,7 +12,7 @@ export default function TabLayout() {
         options={{ title: "Detail", headerShown: false, href: null }}
       />
       <Tabs.Screen
-        name="user-detail"
+        name="user_detail"
         options={{ title: "UserDetail", headerShown: false, href: null }}
       />
     </Tabs>
