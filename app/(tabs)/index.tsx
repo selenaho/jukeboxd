@@ -49,7 +49,6 @@ export default function Index() {
         .from("AlbumReview")
         .select(
           `
-          album_review_id,
           user_id,
           album_review_date,
           album_review_text,

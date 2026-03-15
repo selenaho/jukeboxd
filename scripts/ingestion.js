@@ -174,7 +174,7 @@ async function run() {
           album_id: album.id,
           album_name: album.name,
           album_release_date: album.release_date,
-          album_art_url: album.images[2]?.url || album.images[1]?.url || album.images[0]?.url || null // prioritizing the smaller images first rather than the larger ones bc this is mobile app
+          album_art_url: album.images[1]?.url || album.images[0]?.url || null // prioritizing the smaller images first rather than the larger ones bc this is mobile app
         });
 
         albumArtistBatch.push({

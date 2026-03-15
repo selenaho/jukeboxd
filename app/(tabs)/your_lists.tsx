@@ -44,7 +44,6 @@ export default function YourListsScreen() {
         .from("AlbumReview")
         .select(
           `
-          album_review_id,
           album_id,
           album_review_rating,
           Album(album_id, album_name, album_art_url)
