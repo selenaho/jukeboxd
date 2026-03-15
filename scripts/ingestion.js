@@ -18,6 +18,8 @@ const albumArtistBatch = [];
 const songAlbumBatch = [];
 const songArtistBatch = [];
 
+const seenArtists = new Set();
+
 // load artists from artists.txt
 const artists = fs.readFileSync('artists.txt', 'utf-8').split('\n').map(s => s.trim()).filter(Boolean);
 
@@ -36,12 +38,29 @@ async function retry(fn, retries = 3, delay = 1000) {
   }
 }
 
-async function flushBatch(table, batch) {
+//to help us not try to do an upsert with duplicate records within the same batch
+function removeDuplicates(arr, keys) {
+  const keyList = keys.split(',').map(k => k.trim());
+  const map = new Map();
+
+  for (const item of arr) {
+    const compositeKey = keyList.map(k => item[k]).join('|');
+    map.set(compositeKey, item);
+  }
+
+  return Array.from(map.values());
+}
+
+async function flushBatch(table, batch, conflictColumns) {
   if (batch.length === 0) return;
+
+  const removedDupes = removeDuplicates(batch, conflictColumns);
 
   const { error } = await supabase
     .from(table)
-    .upsert(batch);
+    .upsert(removedDupes, {
+      onConflict: conflictColumns
+    });
 
   if (error) {
     console.error(`Error inserting into ${table}`, error);
@@ -51,12 +70,12 @@ async function flushBatch(table, batch) {
 }
 
 async function flushAll() {
-  await flushBatch("Artist", artistsBatch);
-  await flushBatch("Album", albumsBatch);
-  await flushBatch("Song", songsBatch);
-  await flushBatch("SongAlbum", songAlbumBatch);
-  await flushBatch("AlbumArtist", albumArtistBatch);
-  await flushBatch("SongArtist", songArtistBatch);
+  await flushBatch("Artist", artistsBatch, "artist_id");
+  await flushBatch("Album", albumsBatch, "album_id");
+  await flushBatch("Song", songsBatch, "song_id");
+  await flushBatch("SongAlbum", songAlbumBatch, "song_id,album_id");
+  await flushBatch("AlbumArtist", albumArtistBatch, "album_id,artist_id");
+  await flushBatch("SongArtist", songArtistBatch, "song_id,artist_id");
 }
 
 async function getSpotifyAccessToken() {
@@ -180,6 +199,22 @@ async function run() {
             song_id: track.id,
             artist_id: artistData.id
           });
+
+          // for each of the artists on the track, we also want to add them to the Artist table and the SongArtist join table (since there can be multiple artists on a track)
+          for (const trackArtist of track.artists) {
+            if (!seenArtists.has(trackArtist.id)) { // avoid adding repeating artists again to Artist table
+              seenArtists.add(trackArtist.id);
+              artistsBatch.push({
+                artist_id: trackArtist.id,
+                artist_name: trackArtist.name
+              });
+            }
+            songArtistBatch.push({
+              song_id: track.id,
+              artist_id: trackArtist.id
+            });
+            
+          }
         }
       }
     } catch (error) {
