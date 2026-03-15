@@ -1,3 +1,4 @@
+import RatingSection from "@/components/RatingSection";
 import { supabase } from "@/utils/supabase";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -36,10 +37,20 @@ export default function DetailScreen() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<FilterTab>("All");
 
+  //getting current user id for reviews
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUserId(data.user?.id ?? null);
+    });
+  }, []);
+
+
   useEffect(() => {
     setActiveTab("All");
     fetchDetail();
   }, [id, type]);
+    
 
   const fetchDetail = async () => {
     setLoading(true);
@@ -200,6 +211,11 @@ export default function DetailScreen() {
           keyExtractor={(item) => `${item.type}-${item.id}`}
           renderItem={renderRelatedItem}
           contentContainerStyle={styles.listContent}
+          ListFooterComponent={
+            activeTab === "All" && ["Song", "Album"].includes(data?.type ?? "") ? (
+              <RatingSection id={id} type={data!.type as "Song" | "Album"} currentUserId={currentUserId} />
+            ) : null
+          }
         />
       )}
     </View>
