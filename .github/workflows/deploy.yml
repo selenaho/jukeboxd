@@ -34,19 +34,31 @@ jobs:
       - name: Verify dist folder exists
         run: ls -la dist/ || exit 1
 
-      - name: Verify paths are fixed in index.html
+      - name: Verify paths are fixed
         run: |
+          echo "Checking index.html..."
           if grep -q '\.\./\_expo/' dist/index.html; then
             echo "❌ ERROR: Found unfixed paths ../_expo/ in index.html"
-            cat dist/index.html
             exit 1
           fi
-          if grep -q '^[^.]*/_expo/' dist/index.html | grep -v './_expo/'; then
-            echo "❌ ERROR: Found unfixed absolute paths /_expo/ in index.html"
+          if grep -q "/favicon" dist/index.html | grep -v './favicon'; then
+            echo "❌ ERROR: Found unfixed absolute favicon paths in index.html" 
             exit 1
           fi
-          echo "✓ All paths in index.html are correctly fixed"
-          grep -o '\./[a-zA-Z_]*' dist/index.html | head -5
+          echo "✓ index.html paths are correct"
+          
+          echo "Checking JS bundles for malformed asset paths..."
+          if find dist/_expo -name "*.js" -exec grep -l '"/assets/node_modules' {} \; 2>/dev/null; then
+            echo "❌ ERROR: Found unfixed absolute /assets paths in JS bundles"
+            exit 1
+          fi
+          
+          # Verify relative asset paths are present
+          if find dist/_expo -name "*.js" -exec grep -l '"./assets/' {} \; 2>/dev/null | head -1 | grep -q .; then
+            echo "✓ JS bundles have correct relative asset paths"
+          else
+            echo "⚠️  WARNING: No relative ./assets/ paths found in JS bundles (might be normal if no assets are imported)"
+          fi
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

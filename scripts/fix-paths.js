@@ -7,16 +7,20 @@ const distPath = path.join(__dirname, "../dist");
 function fixPathsInContent(content) {
   let fixed = content;
 
+  // Replace ../_expo/ with ./_expo/ (relative paths to parent)
   fixed = fixed.replace(/\.\.\/_expo\//g, "./_expo/");
 
-  fixed = fixed.replace(/\/_expo\//g, "./_expo/");
+  // Replace "/assets/ with "./assets/ (in string literals with double quotes)
+  fixed = fixed.replace(/\"\/assets\//g, '"./assets/');
 
-  fixed = fixed.replace(/\/assets\//g, "./assets/");
+  // Replace '/assets/ with './assets/ (in string literals with single quotes)
+  fixed = fixed.replace(/\'\/assets\//g, "'./assets/");
 
-  fixed = fixed.replace(/\/favicon/g, "./favicon");
+  // Replace src="/..." with src="./..." (but not src="//...")
+  fixed = fixed.replace(/src="\/([^/])/g, 'src="./$1');
 
-  fixed = fixed.replace(/src="\.\.\/\//g, 'src="./');
-  fixed = fixed.replace(/href="\.\.\/\//g, 'href="./');
+  // Replace href="/..." with href="./..." (but not href="//...")
+  fixed = fixed.replace(/href="\/([^/])/g, 'href="./$1');
 
   return fixed;
 }
