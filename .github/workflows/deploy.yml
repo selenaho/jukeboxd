@@ -26,7 +26,10 @@ jobs:
         run: npm ci
 
       - name: Build Expo web app
-        run: npx expo export --platform web --output-dir dist
+        run: npx expo export --platform web --output-dir dist && node scripts/fix-paths.js
+
+      - name: Verify dist folder exists
+        run: ls -la dist/ || exit 1
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
