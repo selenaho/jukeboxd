@@ -1,10 +1,6 @@
 import React from "react";
 import { Image, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
-const { width } = useWindowDimensions();
-const numColumns = width >= 1024 ? 4 : width >= 768 ? 3 : 2;
-const cardWidth = (width - (numColumns + 1) * 25) / numColumns;
-
 interface AlbumCardProps {
   albumName: string;
   albumImage?: string;
@@ -18,12 +14,15 @@ export default function AlbumCard({
   rating,
   reviewCount,
 }: AlbumCardProps) {
+  const { width } = useWindowDimensions();
+  const numColumns = width >= 1024 ? 4 : width >= 768 ? 3 : 2;
+  const cardWidth = (width - (numColumns + 1) * 25) / numColumns;
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, {width: cardWidth}]}>
       {/* album image or albumholder */}
       <View style={styles.imageContainer}>
         {albumImage ? (
-          <Image source={{ uri: albumImage }} style={styles.image} />
+          <Image source={{ uri: albumImage }} style={[styles.image, {width: cardWidth, height: cardWidth,}]} />
         ) : (
           <View style={styles.imagealbumholder}>
             <Text style={styles.albumholderText}>No Image</Text>
@@ -71,15 +70,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
-    width: cardWidth,
   },
   imageContainer: {
     width: "100%",
     backgroundColor: "#f3f4f6",
   },
   image: {
-    width: cardWidth,
-    height: cardWidth,
+    
   },
   imagealbumholder: {
     width: "100%",

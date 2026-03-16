@@ -1,10 +1,6 @@
 import React from "react";
 import { Image, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
-const { width } = useWindowDimensions();
-const numColumns = width >= 1024 ? 4 : width >= 768 ? 3 : 2;
-const cardWidth = (width - (numColumns + 1) * 25) / numColumns;
-
 interface SongCardProps {
   songName: string;
   songImage?: string;
@@ -18,12 +14,16 @@ export default function SongCard({
   rating,
   reviewCount,
 }: SongCardProps) {
+  const { width } = useWindowDimensions();
+  const numColumns = width >= 1024 ? 4 : width >= 768 ? 3 : 2;
+  const cardWidth = (width - (numColumns + 1) * 25) / numColumns;
+
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, {width: cardWidth}]}>
       {/* song image or songholder */}
       <View style={styles.imageContainer}>
         {songImage ? (
-          <Image source={{ uri: songImage }} style={styles.image} />
+          <Image source={{ uri: songImage }} style={[styles.image, {width: cardWidth, height: cardWidth,}]} />
         ) : (
           <View style={styles.imagesongholder}>
             <Text style={styles.songholderText}>No Image</Text>
@@ -71,15 +71,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
-    width: cardWidth,
+    
   },
   imageContainer: {
     width: "100%",
     backgroundColor: "#f3f4f6",
   },
   image: {
-    width: cardWidth,
-    height: cardWidth,
+    
   },
   imagesongholder: {
     width: "100%",
