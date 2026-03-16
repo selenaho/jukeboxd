@@ -1,63 +1,55 @@
-name: Deploy to GitHub Pages
+name: Deploy Expo Web to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: 20.x
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Expo web app
-        run: EXPO_PUBLIC_USE_STATIC_GENERATION=1 npx expo export --platform web --output-dir dist && node scripts/fix-paths.js
+      - name: Export static web build
+        run: npm run predeploy
         env:
           EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
           EXPO_PUBLIC_SUPABASE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_KEY }}
 
-      - name: Verify dist folder exists
-        run: ls -la dist/ || exit 1
-
-      - name: Verify paths are fixed
+      - name: Verify subpath-safe assets
         run: |
-          echo "Checking index.html..."
-          if grep -q '\.\./\_expo/' dist/index.html; then
-            echo "❌ ERROR: Found unfixed paths ../_expo/ in index.html"
-            exit 1
+          if grep -R -F "../_expo/" dist; then
+            echo "Found unresolved ../_expo/ paths";
+            exit 1;
           fi
-          if grep -q "/favicon" dist/index.html | grep -v './favicon'; then
-            echo "❌ ERROR: Found unfixed absolute favicon paths in index.html" 
-            exit 1
+          if grep -R -F "\"/assets/" dist/_expo/static/js/web; then
+            echo "Found unresolved absolute /assets/ paths in bundles";
+            exit 1;
           fi
-          echo "✓ index.html paths are correct"
 
-          echo "Checking JS bundles for malformed asset paths..."
-          UNFIXED_PATHS=$(find dist/_expo -name "*.js" -exec grep -l '"/assets/node_modules' {} \; 2>/dev/null)
-          if [ -n "$UNFIXED_PATHS" ]; then
-            echo "❌ ERROR: Found unfixed absolute /assets paths in JS bundles:"
-            echo "$UNFIXED_PATHS"
-            exit 1
-          fi
-          echo "✓ No unfixed absolute /assets paths found in JS bundles"
+      - name: Ensure .nojekyll
+        run: touch dist/.nojekyll
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+      - name: Deploy to gh-pages branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          npx gh-pages -d dist -b gh-pages -r "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
