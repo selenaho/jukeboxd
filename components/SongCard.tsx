@@ -5,36 +5,36 @@ const { width } = useWindowDimensions();
 const numColumns = width >= 1024 ? 4 : width >= 768 ? 3 : 2;
 const cardWidth = (width - (numColumns + 1) * 25) / numColumns;
 
-interface AlbumCardProps {
-  albumName: string;
-  albumImage?: string;
+interface SongCardProps {
+  songName: string;
+  songImage?: string;
   rating: number;
   reviewCount: number;
 }
 
-export default function AlbumCard({
-  albumName,
-  albumImage,
+export default function SongCard({
+  songName,
+  songImage,
   rating,
   reviewCount,
-}: AlbumCardProps) {
+}: SongCardProps) {
   return (
     <View style={styles.card}>
-      {/* album image or albumholder */}
+      {/* song image or songholder */}
       <View style={styles.imageContainer}>
-        {albumImage ? (
-          <Image source={{ uri: albumImage }} style={styles.image} />
+        {songImage ? (
+          <Image source={{ uri: songImage }} style={styles.image} />
         ) : (
-          <View style={styles.imagealbumholder}>
-            <Text style={styles.albumholderText}>No Image</Text>
+          <View style={styles.imagesongholder}>
+            <Text style={styles.songholderText}>No Image</Text>
           </View>
         )}
       </View>
 
-      {/* album info */}
+      {/* song info */}
       <View style={styles.content}>
-        <Text style={styles.albumName} numberOfLines={2}>
-          {albumName}
+        <Text style={styles.songName} numberOfLines={2}>
+          {songName}
         </Text>
 
         {/* Rating */}
@@ -81,21 +81,21 @@ const styles = StyleSheet.create({
     width: cardWidth,
     height: cardWidth,
   },
-  imagealbumholder: {
+  imagesongholder: {
     width: "100%",
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#e5e7eb",
   },
-  albumholderText: {
+  songholderText: {
     color: "#9ca3af",
     fontSize: 12,
   },
   content: {
     padding: 12,
   },
-  albumName: {
+  songName: {
     fontSize: 14,
     fontWeight: "600",
     color: "#1f2937",
