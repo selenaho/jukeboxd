@@ -46,19 +46,15 @@ jobs:
             exit 1
           fi
           echo "✓ index.html paths are correct"
-          
+
           echo "Checking JS bundles for malformed asset paths..."
-          if find dist/_expo -name "*.js" -exec grep -l '"/assets/node_modules' {} \; 2>/dev/null; then
-            echo "❌ ERROR: Found unfixed absolute /assets paths in JS bundles"
+          UNFIXED_PATHS=$(find dist/_expo -name "*.js" -exec grep -l '"/assets/node_modules' {} \; 2>/dev/null)
+          if [ -n "$UNFIXED_PATHS" ]; then
+            echo "❌ ERROR: Found unfixed absolute /assets paths in JS bundles:"
+            echo "$UNFIXED_PATHS"
             exit 1
           fi
-          
-          # Verify relative asset paths are present
-          if find dist/_expo -name "*.js" -exec grep -l '"./assets/' {} \; 2>/dev/null | head -1 | grep -q .; then
-            echo "✓ JS bundles have correct relative asset paths"
-          else
-            echo "⚠️  WARNING: No relative ./assets/ paths found in JS bundles (might be normal if no assets are imported)"
-          fi
+          echo "✓ No unfixed absolute /assets paths found in JS bundles"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
