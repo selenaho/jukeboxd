@@ -13,6 +13,8 @@ const linking = {
   ],
   config: {
     screens: {
+      // Root index route - matches empty path "/" when app loads
+      index: "",
       "(auth)": {
         screens: {
           login: "login",
@@ -21,7 +23,7 @@ const linking = {
       },
       "(tabs)": {
         screens: {
-          index: "",
+          index: "home", // Changed from "" to avoid conflict with root index
           detail: "detail",
           profile: "profile",
           search: "search",
@@ -63,13 +65,15 @@ export default function RootLayout() {
     if (loading) return; // if we're still checking auth status, do nothing
 
     const isAuthRoute = segments[0] === "(auth)"; // check if current route is an auth route
+    const isRootIndex = segments.length === 0 || segments[0] === "index"; // check if at root index
 
     if (!session && !isAuthRoute) {
       // if not logged in and not on an auth route, redirect to login
-      router.push("/login");
-    } else if (session && isAuthRoute) {
-      // if logged in and on an auth route, redirect to home
-      router.push("/");
+      router.replace("/login");
+    } else if (session && (isAuthRoute || isRootIndex)) {
+      // if logged in and on an auth route or root index, redirect to home
+      // router.replace instead of router.push to avoid adding to stack
+      router.replace("/home");
     }
   }, [session, segments, loading]); // run this effect whenever session or route segments change
 

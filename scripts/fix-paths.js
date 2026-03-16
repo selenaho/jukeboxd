@@ -40,6 +40,17 @@ try {
     console.log("✓ Injected <base> tag for GitHub Pages subdirectory routing");
   }
 
+  // Add a noscript redirect fallback and script for better deep linking support
+  const head = fixedHtml.match(/<head[^>]*>/);
+  if (head && !fixedHtml.includes('id="expo-spa-root"')) {
+    // Add div with proper ID for Expo Router
+    const rootScriptTag = `<div id="expo-spa-root"></div>`;
+    if (!fixedHtml.includes('id="expo-spa-root"')) {
+      fixedHtml = fixedHtml.replace(/<head[^>]*>[\s\S]*?<body[^>]*>/, 
+        match => match.replace(/<body[^>]*>/, `$&\n    ${rootScriptTag}`));
+    }
+  }
+
   if (fixedHtml !== originalHtml) {
     fs.writeFileSync(indexPath, fixedHtml, "utf-8");
     if (!originalHtml.includes("<base href=")) {
