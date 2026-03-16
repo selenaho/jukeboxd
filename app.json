@@ -23,7 +23,7 @@
       "package": "com.anonymous.jukeboxd"
     },
     "web": {
-      "output": "single",
+      "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
@@ -43,6 +43,7 @@
       "expo-sqlite"
     ],
     "experiments": {
+      "baseUrl": "/jukeboxd",
       "typedRoutes": true,
       "reactCompiler": true
     }
