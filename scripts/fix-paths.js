@@ -28,12 +28,25 @@ function fixPathsInContent(content) {
 // fix index.html specifically for visibility
 const indexPath = path.join(distPath, "index.html");
 try {
-  const originalHtml = fs.readFileSync(indexPath, "utf-8");
-  const fixedHtml = fixPathsInContent(originalHtml);
+  let originalHtml = fs.readFileSync(indexPath, "utf-8");
+  let fixedHtml = fixPathsInContent(originalHtml);
+
+  // Inject <base> tag for Expo Router to work correctly with GitHub Pages subdirectory
+  // This tells the browser to treat /jukeboxd/ as the base URL for relative paths
+  const baseTag = '<base href="/jukeboxd/" />';
+  if (!fixedHtml.includes("<base href=")) {
+    // Insert base tag right after <head> opening tag
+    fixedHtml = fixedHtml.replace(/<head[^>]*>/, `$&\n    ${baseTag}`);
+    console.log("✓ Injected <base> tag for GitHub Pages subdirectory routing");
+  }
 
   if (fixedHtml !== originalHtml) {
     fs.writeFileSync(indexPath, fixedHtml, "utf-8");
-    console.log("✓ Fixed paths in index.html");
+    if (!originalHtml.includes("<base href=")) {
+      console.log("✓ Fixed paths in index.html and added base tag");
+    } else {
+      console.log("✓ Fixed paths in index.html");
+    }
   } else {
     console.log("ℹ No path changes needed in index.html");
   }
