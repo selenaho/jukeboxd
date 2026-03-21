@@ -1,0 +1,86 @@
+{
+  "apiRoutes": [
+    {
+      "file": "_expo/functions/api/search-spotify+api.js",
+      "page": "/api/search-spotify",
+      "namedRegex": "^/api/search\\-spotify(?:/)?$",
+      "routeKeys": {}
+    }
+  ],
+  "htmlRoutes": [
+    {
+      "file": "./(tabs)/index.tsx",
+      "page": "/(tabs)/index",
+      "namedRegex": "^(?:/\\(tabs\\))?(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./App.tsx",
+      "page": "/App",
+      "namedRegex": "^/App(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./(auth)/login.tsx",
+      "page": "/(auth)/login",
+      "namedRegex": "^(?:/\\(auth\\))?/login(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./(tabs)/search.tsx",
+      "page": "/(tabs)/search",
+      "namedRegex": "^(?:/\\(tabs\\))?/search(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./(tabs)/detail.tsx",
+      "page": "/(tabs)/detail",
+      "namedRegex": "^(?:/\\(tabs\\))?/detail(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./(auth)/signup.tsx",
+      "page": "/(auth)/signup",
+      "namedRegex": "^(?:/\\(auth\\))?/signup(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./(tabs)/profile.tsx",
+      "page": "/(tabs)/profile",
+      "namedRegex": "^(?:/\\(tabs\\))?/profile(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "expo-router/build/views/Sitemap.js",
+      "page": "/_sitemap",
+      "namedRegex": "^/_sitemap(?:/)?$",
+      "routeKeys": {},
+      "generated": true
+    },
+    {
+      "file": "./(tabs)/your_lists.tsx",
+      "page": "/(tabs)/your_lists",
+      "namedRegex": "^(?:/\\(tabs\\))?/your_lists(?:/)?$",
+      "routeKeys": {}
+    },
+    {
+      "file": "./(tabs)/user_detail.tsx",
+      "page": "/(tabs)/user_detail",
+      "namedRegex": "^(?:/\\(tabs\\))?/user_detail(?:/)?$",
+      "routeKeys": {}
+    }
+  ],
+  "notFoundRoutes": [
+    {
+      "file": "expo-router/build/views/Unmatched.js",
+      "page": "/+not-found",
+      "namedRegex": "^(?:/(?<notfound>.+?))?(?:/)?$",
+      "routeKeys": {
+        "notfound": "not-found"
+      },
+      "generated": true
+    }
+  ],
+  "redirects": [],
+  "rewrites": []
+}
