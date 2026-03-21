@@ -1,3 +1,4 @@
+import RequestMusicModal from "@/components/RequestMusicModal";
 import { supabase } from "@/utils/supabase";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -26,6 +27,7 @@ export default function SearchScreen() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false); // for requesting new music
 
   const fetchItems = async (query: string, tab: Tab) => {
     setLoading(true);
@@ -201,6 +203,24 @@ export default function SearchScreen() {
           renderItem={renderItem}
         />
       )}
+      {activeTab !== "Users" ? (
+        <View>
+          <TouchableOpacity
+          style={styles.requestLink}
+          onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.requestLinkText}>
+              Can't find what you're looking for?
+            </Text>
+          </TouchableOpacity>
+
+          <RequestMusicModal
+            visible={modalVisible}
+            onClose={() => setModalVisible(false)}
+          />
+        </View>
+      ) : null /* only show request link for music items, not users */}
+      
     </View>
   );
 }
@@ -253,5 +273,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 40,
     fontSize: 15,
+  },
+  requestLink: {
+  paddingVertical: 20,
+  alignItems: "center",
+  },
+  requestLinkText: {
+    fontSize: 14,
+    color: "#1DB954",
+    textDecorationLine: "underline",
   },
 });
