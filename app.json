@@ -23,7 +23,7 @@
       "package": "com.anonymous.jukeboxd"
     },
     "web": {
-      "output": "static",
+      "output": "server",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
