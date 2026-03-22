@@ -6,12 +6,13 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 
-interface AlbumReviewActivity {
+interface ReviewActivity {
   id: string;
   userId: string;
   userName: string;
   userAvatar?: string;
-  albumName: string;
+  itemName: string;
+  itemType: "Album" | "Song";
   reviewText: string;
   rating: number;
   timestamp: string;
@@ -20,14 +21,14 @@ interface AlbumReviewActivity {
 
 export default function Index() {
   const router = useRouter();
-  const [activities, setActivities] = useState<AlbumReviewActivity[]>([]);
+  const [activities, setActivities] = useState<ReviewActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   /**
-   * Load feed activity from Supabase
-   * Fetches recent activity from friends
+   * Load feed activity from following list
+   * Fetches recent AlbumReview and SongReview from all users the current user follows
    */
   const loadFeed = async () => {
     try {
@@ -44,8 +45,30 @@ export default function Index() {
         return;
       }
 
-      // Fetch friend activity from Supabase - AlbumReview data
-      const { data, error } = await supabase
+      // Fetch current user's following list
+      const { data: followingRows, error: followingError } = await supabase
+        .from("Follow")
+        .select("following_id")
+        .eq("follower_id", authUser.id);
+
+      if (followingError) {
+        console.error("Error fetching following list:", followingError);
+        setError("Failed to load feed");
+        return;
+      }
+
+      if (!followingRows || followingRows.length === 0) {
+        setActivities([]);
+        return;
+      }
+
+      // Extract following user IDs
+      const followingIds = followingRows.map((row: any) => row.following_id);
+
+      const allActivities: ReviewActivity[] = [];
+
+      // Fetch AlbumReview from following users
+      const { data: albumReviews, error: albumError } = await supabase
         .from("AlbumReview")
         .select(
           `
@@ -57,33 +80,68 @@ export default function Index() {
           Album(album_name)
         `,
         )
-        .order("album_review_date", { ascending: false })
-        .limit(50);
+        .in("user_id", followingIds);
 
-      if (error) {
-        console.error("Error fetching feed:", error);
-        setError("Failed to load feed");
-        return;
+      if (!albumError && albumReviews) {
+        albumReviews.forEach((item: any) => {
+          allActivities.push({
+            id: `album-${item.user_id}-${item.album_review_date}`,
+            userId: item.user_id,
+            userName: item.User?.user_username || "Unknown User",
+            userAvatar: undefined,
+            itemName: item.Album?.album_name || "Unknown Album",
+            itemType: "Album",
+            reviewText: item.album_review_text || "",
+            rating: Math.round(item.album_review_rating) || 0,
+            timestamp: item.album_review_date
+              ? new Date(item.album_review_date).toLocaleDateString()
+              : "Recently",
+            createdAt: item.album_review_date || new Date().toISOString(),
+          });
+        });
       }
 
-      // Transform data to match AlbumReviewActivity interface
-      const transformedActivities: AlbumReviewActivity[] = (data || []).map(
-        (item: any) => ({
-          id: String(item.album_review_id),
-          userId: item.user_id,
-          userName: item.User?.user_username || "Unknown User",
-          userAvatar: undefined,
-          albumName: item.Album?.album_name || "Unknown Album",
-          reviewText: item.album_review_text || "",
-          rating: Math.round(item.album_review_rating) || 0,
-          timestamp: item.album_review_date
-            ? new Date(item.album_review_date).toLocaleDateString()
-            : "Recently",
-          createdAt: item.album_review_date || new Date().toISOString(),
-        }),
+      // Fetch SongReview from following users
+      const { data: songReviews, error: songError } = await supabase
+        .from("SongReview")
+        .select(
+          `
+          user_id,
+          song_review_date,
+          song_review_text,
+          song_review_rating,
+          User(user_username),
+          Song(song_title)
+        `,
+        )
+        .in("user_id", followingIds);
+
+      if (!songError && songReviews) {
+        songReviews.forEach((item: any) => {
+          allActivities.push({
+            id: `song-${item.user_id}-${item.song_review_date}`,
+            userId: item.user_id,
+            userName: item.User?.user_username || "Unknown User",
+            userAvatar: undefined,
+            itemName: item.Song?.song_title || "Unknown Song",
+            itemType: "Song",
+            reviewText: item.song_review_text || "",
+            rating: Math.round(item.song_review_rating) || 0,
+            timestamp: item.song_review_date
+              ? new Date(item.song_review_date).toLocaleDateString()
+              : "Recently",
+            createdAt: item.song_review_date || new Date().toISOString(),
+          });
+        });
+      }
+
+      // Sort chronologically (newest first)
+      allActivities.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
 
-      setActivities(transformedActivities);
+      setActivities(allActivities);
     } catch (err) {
       console.error("Exception loading feed:", err);
       setError("An error occurred while loading your feed");
@@ -98,17 +156,14 @@ export default function Index() {
     loadFeed();
   }, []);
 
-  /**
-   * Handle pull-to-refresh
-   */
+  // Handle pull-to-refresh
+
   const handleRefresh = () => {
     setRefreshing(true);
     loadFeed();
   };
 
-  /**
-   * Handle find friends button click
-   */
+  // Handle find friends button click
   const handleFindFriends = () => {
     // Navigate to search or friends discovery page
     router.push("/(tabs)/search");
@@ -144,7 +199,7 @@ export default function Index() {
           <ActivityCard
             userName={item.userName}
             userAvatar={item.userAvatar}
-            albumVisited={item.albumName}
+            albumVisited={`${item.itemName} (${item.itemType})`}
             review={item.reviewText}
             rating={item.rating}
             timestamp={item.timestamp}
