@@ -46,6 +46,9 @@ jobs:
       - name: Ensure .nojekyll
         run: touch dist/.nojekyll
 
+      - name: Copy root index.html for GitHub Pages
+        run: cp dist/server/\(tabs\)/index.html dist/index.html
+
       - name: Deploy to gh-pages branch
         run: |
           git config user.name "github-actions[bot]"
