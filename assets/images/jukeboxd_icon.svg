@@ -1,0 +1,31 @@
+<svg width="680" height="680" xmlns="http://www.w3.org/2000/svg" role="img">
+ <title>Jukeboxd app icon</title>
+ <desc>A circular vinyl record app icon for Jukeboxd with green accent colors and transparent background</desc>
+ <defs>
+  <clipPath id="recordClip">
+   <circle id="svg_1" r="250" cy="340" cx="340"/>
+  </clipPath>
+  <mask id="spindleMask">
+   <circle id="svg_2" fill="white" r="250" cy="340" cx="340"/>
+   <circle id="svg_3" fill="black" r="10" cy="340" cx="340"/>
+  </mask>
+ </defs>
+ <g mask="url(#spindleMask)">
+  <title>Layer 1</title>
+  <!-- Vinyl record outer -->
+  <circle id="svg_5" stroke-width="1px" fill="rgb(26, 26, 26)" r="250" cy="340" cx="340"/>
+  <!-- Vinyl grooves -->
+  <circle id="svg_6" stroke-width="1.5px" stroke="rgb(42, 42, 42)" fill="none" r="235" cy="340" cx="340"/>
+  <circle id="svg_7" stroke-width="1px" stroke="rgb(42, 42, 42)" fill="none" r="218" cy="340" cx="340"/>
+  <circle id="svg_8" stroke-width="1px" stroke="rgb(42, 42, 42)" fill="none" r="201" cy="340" cx="340"/>
+  <circle id="svg_9" stroke-width="1px" stroke="rgb(42, 42, 42)" fill="none" r="184" cy="340" cx="340"/>
+  <circle id="svg_10" stroke-width="1px" stroke="rgb(42, 42, 42)" fill="none" r="167" cy="340" cx="340"/>
+  <circle id="svg_11" stroke-width="1px" stroke="rgb(42, 42, 42)" fill="none" r="150" cy="340" cx="340"/>
+  <!-- Record label center -->
+  <circle id="svg_12" stroke-width="1px" fill="rgb(29, 185, 84)" r="100" cy="340" cx="340"/>
+  <!-- Label ring detail -->
+  <circle id="svg_13" stroke-width="1.5px" stroke="rgb(23, 163, 73)" fill="none" r="95" cy="340" cx="340"/>
+  <circle id="svg_14" stroke-width="0.8px" stroke="rgb(23, 163, 73)" fill="none" r="88" cy="340" cx="340"/>
+  <!-- Shine arc -->
+ </g>
+</svg>
