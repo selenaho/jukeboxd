@@ -4,7 +4,7 @@
     "slug": "jukeboxd",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/jukeboxd_icon.png",
     "scheme": "jukeboxd",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -24,7 +24,7 @@
     },
     "web": {
       "output": "server",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/jukeboxd_icon.png"
     },
     "plugins": [
       "expo-router",
