@@ -49,6 +49,11 @@ jobs:
       - name: Copy root index.html for GitHub Pages
         run: cp dist/server/\(tabs\)/index.html dist/index.html
 
+      - name: Flatten dist structure for GitHub Pages
+        run: |
+          cp -r dist/client/_expo dist/_expo
+          cp -r dist/client/assets dist/assets-client 2>/dev/null || true
+
       - name: Deploy to gh-pages branch
         run: |
           git config user.name "github-actions[bot]"

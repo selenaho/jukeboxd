@@ -10,7 +10,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "predeploy": "npx expo export -p web",
-    "postdeploy": "cp dist/server/\\(tabs\\)/index.html dist/index.html",
+    "postdeploy": "cp dist/server/\\(tabs\\)/index.html dist/index.html && cp -r dist/client/_expo dist/_expo && cp -r dist/client/assets dist/assets-client 2>/dev/null || true",
     "deploy": "npm run predeploy && npm run postdeploy && gh-pages -d dist"
   },
   "dependencies": {
