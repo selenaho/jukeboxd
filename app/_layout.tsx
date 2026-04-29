@@ -13,13 +13,22 @@ export default function RootLayout() {
   
   useEffect(() => {
     // check current session 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session); // set session state
-      setLoading(false); // because we're done checking auth status
-    });
+    supabase.auth.getSession()
+      .then(({ data: { session }, error }) => {
+        if (error) {
+          console.error('Error getting session:', error);
+        }
+        setSession(session); // set session state
+        setLoading(false); // because we're done checking auth status
+      })
+      .catch((err) => {
+        console.error('getSession error:', err);
+        setLoading(false); // set loading to false even on error so we don't stay stuck
+      });
 
     // listen for auth changes (login/logout)
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event);
       setSession(session); // update session state on auth change
     });
 
