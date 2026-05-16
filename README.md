@@ -17,3 +17,6 @@ To view the app either
    ```
 
 2. or visit this [link](https://selenaho.github.io/jukeboxd/)
+
+## UML Diagram
+<img width="1892" height="852" alt="image" src="https://github.com/user-attachments/assets/85af988e-fe0e-440a-80a1-32fdafa92bde" />
